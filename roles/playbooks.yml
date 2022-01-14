@@ -1,7 +1,7 @@
 ---
 - name: "Installation Apache"
   hosts: client1
-#  become: true
+  become: true
 #  vars:
 #    ansible_sudo_pass: Benz771986
   tasks:
@@ -28,12 +28,12 @@
         dest: "/etc/httpd/conf.d/http_bk.conf"
         owner: "apache"
         group: "apache"
-      notify:
-      - Restart apache
+#      notify:
+#      - Restart apache
 
-#    handlers:
-#    - name: restart apache
-#      service: 
-#        name: httpd 
-#        state: restarted
+#      handlers:
+#        - name: restart apache
+#          service: 
+#            name: httpd 
+#            state: restarted
 
