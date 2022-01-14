@@ -1,0 +1,39 @@
+---
+- name: "Installation Apache"
+  hosts: client1
+#  become: true
+#  vars:
+#    ansible_sudo_pass: Benz771986
+  tasks:
+    - name: "Installation du Package httpd"
+      yum: 
+        name: "httpd" 
+        state: "latest"
+
+    - name: "Démarrage du service apache"
+      service:
+        name: "httpd"
+        state: "started"
+        enabled: yes
+
+    - name: "Allow http connections"
+      firewalld:
+        service: "http"
+        permanent: yes
+        state: "enabled"
+
+    - name: "Copie du fichier de configuration httpd"
+      copy: 
+        src: "/etc/ansible/files/ssl.conf" 
+        dest: "/etc/httpd/conf.d/http_bk.conf"
+        owner: "apache"
+        group: "apache"
+      notify:
+      - Restart apache
+
+#    handlers:
+#    - name: restart apache
+#      service: 
+#        name: httpd 
+#        state: restarted
+
