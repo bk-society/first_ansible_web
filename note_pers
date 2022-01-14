@@ -1,0 +1,137 @@
+ansible.cfg = configuration de ansible
+/etc/ansible/roles => endroits des roles
+log_path = > dans /var/log en générale
+
+retry_files => laisser désactiver. creer un fichier à chak tentative de lancement d'ansible
+
+
+forks = nombre de taches parrallèle (min 5)
+
+
+
+commandes adhoc :
+
+Les commandes ad hoc sont excellentes pour les tâches que vous répétez rarement.Par exemple, si vous souhaitez éteindre toutes les machines de votre laboratoire pour des vacances de Noël, vous pouvez exécuter une doublure rapide en ligne sans écrire un jeu de jeu.Une commande ad hoc ressemble à ceci:
+$ ansible [pattern] -m [module] -a "[module options]"
+
+
+Le module par défaut de l'utilitaire de ligne de commande ansible est le module  command.Vous pouvez utiliser une tâche ad hoc pour appeler le module de commande et redémarrer tous les serveurs Web à Atlanta, 10 à la fois.
+Avant de pouvoir le faire, vous devez disposer de tous les serveurs d'Atlanta dans un groupe appelé [Atlanta] dans votre inventaire, et vous devez avoir des informations d'identification SSH de travail pour chaque machine de ce groupe.Redémarrer tous les serveurs de la groupe [Atlanta]:
+$ ansible atlanta -a "/sbin/reboot"
+
+
+Par défaut, Ansible utilise seulement 5 processus simultanés.Si vous avez plus d'hosts que la valeur définie pour le nombre de forks, on leur parle, mais il faudra un peu plus longtemps.P our redémarrer les serveurs [Atlanta] avec 10 forks parallèles:
+$ ansible atlanta -a "/sbin/reboot" -f 10
+
+
+/ usr / bin / ansible sera par défaut à partir de votre compte d'utilisateur.Pour se connecter en tant qu'utilisateur différent:
+$ ansible atlanta -a "/sbin/reboot" -f 10 -u username
+
+
+Le redémarrage nécessite probablement une escalade de privilège.Vous pouvez vous connecter au serveur comme nom d'utilisateur et exécuter la commande comme utilisateur root à l'aide du mot clé deven.
+$ ansible atlanta -a "/sbin/reboot" -f 10 -u username --become [--ask-become-pass]
+
+If you add --ask-become-pass or -K, ansile vous invite au mot de passe à utiliser pour l'escalade de privilège (sudo / su / pfexec / doas / etc.).
+
+
+
+Getsion de fichiers:
+
+Une tâche ad hoc peut exploiter la puissance d'Ansible et SCP pour transférer de nombreux fichiers sur plusieurs machines en parallèle. Pour transférer un fichier directement sur tous les serveurs de la groupe [Atlanta]:
+$ ansible atlanta -m  copy -a "src=/etc/hosts dest=/tmp/hosts"
+
+
+Le module  file permet de changer la propriété et les autorisations sur les fichiers.Ces mêmes options peuvent également être transmises directement au module de copie:
+$ ansible webservers -m  file -a "dest=/srv/foo/a.txt mode=600"
+$ ansible webservers -m  file -a "dest=/srv/foo/b.txt mode=600 owner=mdehaan group=mdehaan"
+
+
+The file module can also create directories, similar to mkdir -p:
+$ ansible webservers -m  file -a "dest=/path/to/c mode=755 owner=mdehaan group=mdehaan state=directory"
+
+
+As well as delete directories (recursively) and delete files:
+$ ansible webservers -m  file -a "dest=/path/to/c state=absent"
+
+création d'un fichier /tmp/toto.txt avec comme contenu bonjour mister
+$ ansible -i hosts all -m copy -a "dest=/tmp/toto.txt content='bonjour mister'"
+
+
+
+
+
+Gestion de paquets:
+
+Vous pouvez également utiliser une tâche ad hoc pour installer, mettre à jour ou supprimer des packages sur des nœuds gérés à l'aide d'un module de gestion de paquets comme Yum.
+Pour vous assurer qu'un paquet est installé sans la mise à jour:
+
+$ ansible webservers -m yum -a "name=acme state=present"
+
+
+Pour assurer l'installation d'une version spécifique d'un package:
+$ ansible webservers -m  yum -a "name=acme-1.5 state=present"
+
+
+Pour vous assurer qu'un package est à la dernière version:
+$ ansible webservers -m  yum -a "name=acme state=latest"
+
+
+Pour vous assurer qu'un package n'est pas installé:
+$ ansible webservers -m  yum -a "name=acme state=absent"
+
+Ansible has modules for managing packages under many platforms. If there is no module for your package manager, you can install packages using the command module or create a module for your package manager.
+
+
+
+
+
+Gestion des utilisateurs et des groupes:
+Vous pouvez créer, gérer et supprimer des comptes d'utilisateurs sur vos nœuds gérés avec des tâches ad hoc:
+$ ansible all -m  user -a "name=foo password=<crypted password here>"
+
+$ ansible all -m  user -a "name=foo state=absent"
+
+
+
+
+
+Gestion des services
+Assurez-vous qu'un service est démarré sur tous les serveurs Web:
+$ ansible webservers -m  service -a "name=httpd state=started"
+
+Sinon, redémarrez un service sur tous les serveurs Web:
+$ ansible webservers -m  service -a "name=httpd state=restarted"
+
+Assurez-vous qu'un service est arrêté:
+$ ansible webservers -m  service -a "name=httpd state=stopped"
+
+
+Gathering facts:
+Les faits représentent des variables découvertes sur un système.Vous pouvez utiliser des faits pour mettre en œuvre une exécution conditionnelle de tâches, mais également pour obtenir des informations ad hoc sur vos systèmes.Pour voir tous les faits:
+$ ansible all -m  setup
+
+
+dans ansible.cfg:
+[privilege_escalation]
+become_ask_pass = true
+
+à chaque passage d'ansible, le mot de passe est requis pour devenir root (plus besoin d'écrire à chaque commande --become [--ask-become-pass])
+Permet de ne pas mettre en dur le mot de passe root sur le playbook :
+
+  become: true
+  vars:
+    ansible_sudo_pass: Benz771986
+
+
+
+
+
+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
+
+
+
+
+
+
+
+
