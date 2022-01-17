@@ -31,6 +31,8 @@
         owner: "apache"
         group: "apache"
         mode: 0644
+      notify:
+      - Restart apache
 
     - name: "Creation d'utilisateur"
       user:
@@ -59,13 +61,8 @@
         mode: 0644
 
 
-
-#      notify:
-#      - Restart apache
-
-#      handlers:
-#        - name: restart apache
-#          service: 
-#            name: httpd 
-#            state: restarted
-
+  handlers:
+    - name: restart apache
+      service:
+        name: httpd
+        state: restarted
