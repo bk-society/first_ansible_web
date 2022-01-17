@@ -2,8 +2,10 @@
 - name: "Installation Apache"
   hosts: client1
   become: true
-#  vars:
-#    ansible_sudo_pass: Benz771986
+  vars_files:
+    - files/secrets/credentials.yml
+  vars:
+    ansible_sudo_pass: "{{ vault_ansible_password }}"
   tasks:
     - name: "Installation du Package httpd"
       yum: 
@@ -44,9 +46,9 @@
       package:
         name: "{{ item }}"
         state: present
-      when: ansible_distribution == "CentOS"
+      when: ansible_distribution == "Fedora"
       loop:
-        - epel-release
+        - telnet
         - wget
         - vim    
           
